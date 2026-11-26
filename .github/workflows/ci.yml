@@ -21,10 +21,8 @@ jobs:
         run: |
           go mod tidy
           git diff --exit-code -- go.mod go.sum
-      - uses: actions/upload-artifact@v4
-        with:
-          name: go-sum
-          path: go.sum
+      - name: print go.sum while it is not committed yet
+        run: git ls-files --error-unmatch go.sum >/dev/null 2>&1 || sed 's/^/GOSUM| /' go.sum
       - name: gofmt
         run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
       - run: go vet ./...

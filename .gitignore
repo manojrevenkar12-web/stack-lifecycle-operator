@@ -3,7 +3,7 @@ go.local.mod
 go.local.sum
 bin/
 .envtest-path
-rendered.yaml
+/rendered.yaml
 support-bundle*.tar.gz
 __pycache__/
 *.egg-info/

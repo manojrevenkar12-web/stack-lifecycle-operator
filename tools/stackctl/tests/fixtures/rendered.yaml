@@ -1,0 +1,606 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-postgres
+  namespace: default
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+  selector:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: platform
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-rabbitmq
+  namespace: default
+spec:
+  ports:
+  - name: rabbitmq
+    port: 5672
+    targetPort: 5672
+  selector:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/part-of: platform
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: core
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-core
+  namespace: default
+spec:
+  ports:
+  - name: core
+    port: 8080
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: core
+    app.kubernetes.io/part-of: platform
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: gateway
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-gateway
+  namespace: default
+spec:
+  ports:
+  - name: gateway
+    port: 8443
+    targetPort: 8443
+  selector:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: gateway
+    app.kubernetes.io/part-of: platform
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+data:
+  AUDIT_LEVEL: full
+  EXPORT_COMPRESSION: none
+  EXPORT_FORMAT: xml
+  MQ_PREFETCH: "50"
+  PLATFORM_VERSION: 4.3.0
+  RETENTION_DAYS: "180"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: core
+    app.kubernetes.io/part-of: platform
+    platform.stacklifecycle.io/version: 4.3.0
+  name: site-frankfurt-config-4-3-0
+  namespace: default
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: db-tools
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-backup
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+status: {}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-postgres
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: site-frankfurt
+      app.kubernetes.io/managed-by: stack-lifecycle-operator
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/part-of: platform
+  serviceName: site-frankfurt-postgres
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/postgres:16
+        name: postgres
+        ports:
+        - containerPort: 5432
+          name: postgres
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          tcpSocket:
+            port: 5432
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /var/lib/postgres
+          name: data
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+  updateStrategy: {}
+  volumeClaimTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+    status: {}
+status:
+  availableReplicas: 0
+  replicas: 0
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-rabbitmq
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: site-frankfurt
+      app.kubernetes.io/managed-by: stack-lifecycle-operator
+      app.kubernetes.io/name: rabbitmq
+      app.kubernetes.io/part-of: platform
+  serviceName: site-frankfurt-rabbitmq
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: rabbitmq
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/rabbitmq:3.12
+        name: rabbitmq
+        ports:
+        - containerPort: 5672
+          name: rabbitmq
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          tcpSocket:
+            port: 5672
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /var/lib/rabbitmq
+          name: data
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+  updateStrategy: {}
+  volumeClaimTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+    status: {}
+status:
+  availableReplicas: 0
+  replicas: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: core
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-core
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: site-frankfurt
+      app.kubernetes.io/managed-by: stack-lifecycle-operator
+      app.kubernetes.io/name: core
+      app.kubernetes.io/part-of: platform
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        platform.stacklifecycle.io/config-hash: 8b7508c406bab79f
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: core
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: site-frankfurt-config-4-3-0
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/core:4.3.0
+        name: core
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 10
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: gateway
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-gateway
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: site-frankfurt
+      app.kubernetes.io/managed-by: stack-lifecycle-operator
+      app.kubernetes.io/name: gateway
+      app.kubernetes.io/part-of: platform
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        platform.stacklifecycle.io/config-hash: 8b7508c406bab79f
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: gateway
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: site-frankfurt-config-4-3-0
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/gateway:4.3.0
+        name: gateway
+        ports:
+        - containerPort: 8443
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8443
+          periodSeconds: 10
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+status: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: db-tools
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-backup-13
+  namespace: default
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: db-tools
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - backup
+        - --schema
+        - "13"
+        - --to
+        - /backup
+        env:
+        - name: DATABASE_HOST
+          value: site-frankfurt-postgres
+        envFrom:
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/db-tools:4.3.0
+        name: job
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /backup
+          name: backup
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+      - name: backup
+        persistentVolumeClaim:
+          claimName: site-frankfurt-backup
+  ttlSecondsAfterFinished: 604800
+status: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: site-frankfurt
+    app.kubernetes.io/managed-by: stack-lifecycle-operator
+    app.kubernetes.io/name: db-tools
+    app.kubernetes.io/part-of: platform
+  name: site-frankfurt-migrate-13
+  namespace: default
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: site-frankfurt
+        app.kubernetes.io/managed-by: stack-lifecycle-operator
+        app.kubernetes.io/name: db-tools
+        app.kubernetes.io/part-of: platform
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - migrate
+        - --to
+        - "13"
+        env:
+        - name: DATABASE_HOST
+          value: site-frankfurt-postgres
+        envFrom:
+        - secretRef:
+            name: site-frankfurt-credentials
+        image: registry.example.com/platform/core:4.3.0
+        name: job
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - emptyDir: {}
+        name: tmp
+  ttlSecondsAfterFinished: 604800
+status: {}
