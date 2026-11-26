@@ -1,0 +1,41 @@
+# The operator itself, restricted-v2 ready: no fixed UID, no capabilities, read-only root.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stack-lifecycle-operator
+  labels: {app.kubernetes.io/name: stack-lifecycle-operator}
+spec:
+  replicas: 2   # leader election keeps one active; the other takes over within the lease
+  selector:
+    matchLabels: {app.kubernetes.io/name: stack-lifecycle-operator}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: stack-lifecycle-operator}
+    spec:
+      serviceAccountName: stack-lifecycle-operator
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: manager
+          image: ghcr.io/manojrevenkar12-web/stack-lifecycle-operator:0.1.0
+          args: [--leader-elect]
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - name: STACK_IMAGE_REGISTRY
+              value: registry.example.com/platform
+          ports:
+            - {name: metrics, containerPort: 8080}
+            - {name: probes, containerPort: 8081}
+          livenessProbe:
+            httpGet: {path: /healthz, port: probes}
+          readinessProbe:
+            httpGet: {path: /readyz, port: probes}
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}

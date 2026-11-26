@@ -1,0 +1,15 @@
+# local module setup (offline proxy); CI resolves go.sum from the public proxy
+go.local.mod
+go.local.sum
+bin/
+.envtest-path
+rendered.yaml
+support-bundle*.tar.gz
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+/operator
+/render
+/lab

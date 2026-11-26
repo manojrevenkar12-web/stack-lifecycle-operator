@@ -1,0 +1,55 @@
+{
+  "_comment": "Release catalog for the managed platform. Each release says which versions may upgrade to it directly, the database schema it needs, whether that migration can be reversed, and how application config changes.",
+  "releases": [
+    {
+      "version": "4.2.0",
+      "schema": 12,
+      "messaging": "3.12",
+      "upgradeFrom": [],
+      "reversible": true,
+      "config": {
+        "known": ["retention.days", "export.format", "mq.prefetch", "audit.level"],
+        "required": ["retention.days"]
+      }
+    },
+    {
+      "version": "4.3.0",
+      "schema": 13,
+      "messaging": "3.12",
+      "upgradeFrom": ["4.2.0"],
+      "reversible": true,
+      "config": {
+        "known": ["retention.days", "export.format", "export.compression", "mq.prefetch", "audit.level"],
+        "required": ["retention.days"],
+        "defaults": {"export.compression": "none"}
+      }
+    },
+    {
+      "version": "5.0.0",
+      "schema": 20,
+      "messaging": "3.13",
+      "upgradeFrom": ["4.3.0"],
+      "reversible": false,
+      "config": {
+        "known": ["retention.days", "handover.format", "export.compression", "messaging.prefetch", "audit.level"],
+        "required": ["retention.days", "handover.format"],
+        "renames": {"export.format": "handover.format", "mq.prefetch": "messaging.prefetch"},
+        "values": {"handover.format": ["xml", "asn1"], "audit.level": ["basic", "full"]}
+      }
+    },
+    {
+      "version": "5.1.0",
+      "schema": 21,
+      "messaging": "3.13",
+      "upgradeFrom": ["5.0.0"],
+      "reversible": true,
+      "config": {
+        "known": ["retention.days", "handover.format", "export.compression", "messaging.prefetch", "audit.level", "tls.minVersion"],
+        "required": ["retention.days", "handover.format"],
+        "defaults": {"tls.minVersion": "1.2"},
+        "removed": ["export.compression"],
+        "values": {"handover.format": ["xml", "asn1"], "audit.level": ["basic", "full"], "tls.minVersion": ["1.2", "1.3"]}
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: platformstacks.platform.stacklifecycle.io
+spec:
+  group: platform.stacklifecycle.io
+  names:
+    kind: PlatformStack
+    listKind: PlatformStackList
+    plural: platformstacks
+    singular: platformstack
+    shortNames: [pstack]
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - {name: Phase, type: string, jsonPath: .status.phase}
+        - {name: Installed, type: string, jsonPath: .status.installedVersion}
+        - {name: Target, type: string, jsonPath: .status.targetVersion}
+        - {name: Schema, type: integer, jsonPath: .status.schemaVersion}
+        - {name: Age, type: date, jsonPath: .metadata.creationTimestamp}
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: "One installation of the platform: database, message broker, core service and gateway."
+          properties:
+            apiVersion: {type: string}
+            kind: {type: string}
+            metadata: {type: object}
+            spec:
+              type: object
+              required: [version, database, messaging]
+              properties:
+                version:
+                  type: string
+                  description: Release to run. Changing it starts an upgrade.
+                  pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+                config:
+                  type: object
+                  description: Application configuration; keys of older releases are migrated.
+                  additionalProperties: {type: string}
+                database: &storage
+                  type: object
+                  required: [size]
+                  properties:
+                    size:
+                      anyOf: [{type: integer}, {type: string}]
+                      x-kubernetes-int-or-string: true
+                      pattern: '^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$'
+                    storageClassName: {type: string}
+                messaging: *storage
+                coreReplicas: {type: integer, format: int32, minimum: 0, maximum: 20}
+                gatewayReplicas: {type: integer, format: int32, minimum: 0, maximum: 20}
+                upgrade:
+                  type: object
+                  properties:
+                    skipPreflight: {type: boolean}
+                    skipBackup: {type: boolean}
+                    disableAutoRollback: {type: boolean}
+                    stepTimeoutSeconds: {type: integer, format: int32, minimum: 30}
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true

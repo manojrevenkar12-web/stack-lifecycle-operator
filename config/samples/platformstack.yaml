@@ -1,0 +1,15 @@
+apiVersion: platform.stacklifecycle.io/v1alpha1
+kind: PlatformStack
+metadata:
+  name: site-frankfurt
+spec:
+  version: 4.3.0
+  config:
+    retention.days: "180"
+    export.format: xml
+    mq.prefetch: "50"
+    audit.level: full
+  database: {size: 100Gi}
+  messaging: {size: 20Gi}
+  coreReplicas: 2
+  gatewayReplicas: 2

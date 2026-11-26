@@ -1,0 +1,59 @@
+# Upgrade lab settings. Every number here is an ASSUMPTION, not a measurement from a real fleet.
+# They are set to plausible values for an on-premise platform that customers run themselves, so
+# the designs can be compared on the same luck. Change them and rerun the dev split; the held-out
+# split is locked once it has run (results/HELDOUT.lock).
+
+fleet:
+  sites: 300            # customer installations upgraded per seed
+  target: "5.1.0"
+  start:                # share of sites on each release before the campaign
+    "4.2.0": 0.15
+    "4.3.0": 0.45
+    "5.0.0": 0.40
+  database_gib: [20, 200]   # uniform range of database size per site
+
+world:                  # chance per site (or per hop / per rollout) that something is wrong
+  config_typo: 0.06         # a hand-edited value is misspelled (audit.level: "ful")
+  queue_not_drained: 0.10   # messages still queued when the window starts
+  low_backup_space: 0.05    # the database volume cannot hold a backup
+  unhealthy_before: 0.03    # a component is already degraded before the upgrade
+  migration_fails:          # the schema migration job fails
+    irreversible: 0.05      # big migrations (4.3.0 -> 5.0.0)
+    reversible: 0.015
+  rollout_stalls: 0.02      # per service rollout: new pods never become ready
+  online_write_loss: 0.15   # an irreversible migration run while writers are up loses writes
+  restore_fails: 0.02       # restoring the backup itself fails (corrupt dump, wrong volume)
+
+people:                 # the scripted runbook (today's process)
+  skips_check: 0.20         # a manual preflight check skipped under time pressure
+  misses_backup: 0.08
+  misses_quiesce: 0.08
+  misses_rename: 0.10       # a renamed config key not carried over by hand
+
+minutes:                # durations used for downtime and engineer time
+  backup_per_gib: 0.20
+  restore_per_gib: 0.30
+  migrate_irreversible: 25
+  migrate_reversible: 6
+  rollout: 4
+  broker: 6
+  broker_outage: 3          # single broker restart: messages are not accepted meanwhile
+  verify: 2
+  quiesce: 1
+  manual_step_overhead: 5   # a person reading the runbook and typing the next command
+  diagnose: 45              # a person working out what broke before acting
+  manual_recovery: 360      # restoring a broken site by hand from the nightly backup
+
+engineer_minutes:
+  operator_review: 10       # approving the version change and watching the conditions
+  helm_attend_per_hop: 20
+  scripted_prepare: 30
+  fix_config: 20
+  grow_volume: 30
+  fix_health: 60
+  investigate_failure: 30   # after an automatic rollback
+  manual_recovery: 360
+
+seeds:
+  dev: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  heldout: [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120]

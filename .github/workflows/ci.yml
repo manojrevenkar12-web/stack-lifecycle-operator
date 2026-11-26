@@ -1,0 +1,114 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: go.mod and go.sum are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+      - uses: actions/upload-artifact@v4
+        with:
+          name: go-sum
+          path: go.sum
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - run: go vet ./...
+      - name: envtest binaries (Kubernetes 1.33)
+        run: echo "KUBEBUILDER_ASSETS=$(go run sigs.k8s.io/controller-runtime/tools/setup-envtest@release-0.21 use 1.33.0 --bin-dir "$RUNNER_TEMP/envtest" -p path)" >> "$GITHUB_ENV"
+      - name: tests (unit + envtest controller tests)
+        run: go test -count=1 ./...
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/stackctl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml pytest ruff
+      - run: python -m pytest -q
+      - run: ruff check .
+      - run: ruff format --check .
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - run: go mod tidy
+      - name: render the sample at every release it can upgrade to and lint against restricted-v2 and RBAC rules
+        run: |
+          for v in 4.3.0 5.0.0 5.1.0; do
+            go run ./cmd/render -f config/samples/platformstack.yaml -version "$v" >> rendered.yaml
+          done
+          cat config/rbac/*.yaml config/manager/manager.yaml >> rendered.yaml
+          cd tools/stackctl && python -m stackctl.cli openshift-lint ../../rendered.yaml
+
+  lab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go mod tidy
+      - name: generated reports are current
+        run: go run ./cmd/lab report --check
+      - name: dev split is reproducible
+        run: |
+          go run ./cmd/lab sim --split dev
+          git diff --exit-code -- results/dev.json
+      - name: held-out split stays locked
+        run: |
+          test -f results/HELDOUT.lock
+          if go run ./cmd/lab sim --split heldout; then echo "held-out split ran twice" && exit 1; fi
+
+  review-gate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: AI-assisted change rules
+        run: cd tools/stackctl && python -m stackctl.cli review-gate --base "origin/${{ github.base_ref }}" --head "${{ github.event.pull_request.head.sha }}" --rules ../../config/review-gate.yaml --summary "$GITHUB_STEP_SUMMARY"
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go mod tidy
+      - run: docker build -t stack-lifecycle-operator:ci .
+      - name: image runs as non-root
+        run: test "$(docker inspect -f '{{.Config.User}}' stack-lifecycle-operator:ci)" = "65532:65532"

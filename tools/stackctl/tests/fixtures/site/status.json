@@ -1,0 +1,1 @@
+{"kind": "PlatformStack", "status": {"phase": "RollingBack", "conditions": [{"type": "Ready", "message": "Migrate(5.0.0): job site-migrate-20 failed: migration step 17 failed"}]}}

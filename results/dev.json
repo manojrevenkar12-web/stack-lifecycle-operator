@@ -1,0 +1,375 @@
+{
+  "split": "dev",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "sites_per_seed": 300,
+  "target": "5.1.0",
+  "start_mix": {
+    "4.2.0": 42,
+    "4.3.0": 125,
+    "5.0.0": 133
+  },
+  "config_sha256": "f10edb9f4e52f46900adee37912cf3ea3e8a0ae4090cd3ed446409d4c426fc7b",
+  "designs": [
+    {
+      "design": "scripted",
+      "label": "Scripted runbook (today)",
+      "metrics": {
+        "broken": {
+          "mean": 1.3,
+          "ci95": 0.38
+        },
+        "clean_rollbacks": {
+          "mean": 15.4,
+          "ci95": 1.14
+        },
+        "data_loss": {
+          "mean": 2.53,
+          "ci95": 0.39
+        },
+        "downtime": {
+          "mean": 39.4,
+          "ci95": 1.33
+        },
+        "engineer": {
+          "mean": 253.27,
+          "ci95": 2.81
+        },
+        "failed": {
+          "mean": 17.4,
+          "ci95": 1.05
+        },
+        "first_try": {
+          "mean": 70.83,
+          "ci95": 0.78
+        },
+        "message_loss": {
+          "mean": 1.07,
+          "ci95": 0.33
+        },
+        "preflight_blocks": {
+          "mean": 13.2,
+          "ci95": 0.97
+        },
+        "reached": {
+          "mean": 82.6,
+          "ci95": 1.05
+        }
+      },
+      "downtime_p95_minutes": 136.3,
+      "failure_causes": {
+        "backup-space": 20,
+        "config": 188,
+        "health": 11,
+        "migration": 123,
+        "online-migration": 20,
+        "queues-not-drained": 23,
+        "rollout": 176
+      },
+      "blocked_checks": {
+        "backup-space": 82,
+        "config": 132,
+        "health": 74,
+        "queues-drained": 138
+      }
+    },
+    {
+      "design": "helm_atomic",
+      "label": "helm upgrade --atomic",
+      "metrics": {
+        "broken": {
+          "mean": 13.53,
+          "ci95": 0.71
+        },
+        "clean_rollbacks": {
+          "mean": 9.2,
+          "ci95": 1.7
+        },
+        "data_loss": {
+          "mean": 20.07,
+          "ci95": 1.33
+        },
+        "downtime": {
+          "mean": 57.32,
+          "ci95": 2.76
+        },
+        "engineer": {
+          "mean": 145.73,
+          "ci95": 4.54
+        },
+        "failed": {
+          "mean": 22.73,
+          "ci95": 1.33
+        },
+        "first_try": {
+          "mean": 67.87,
+          "ci95": 0.94
+        },
+        "message_loss": {
+          "mean": 5.47,
+          "ci95": 0.74
+        },
+        "preflight_blocks": {
+          "mean": 0,
+          "ci95": 0
+        },
+        "reached": {
+          "mean": 77.27,
+          "ci95": 1.33
+        }
+      },
+      "downtime_p95_minutes": 375.5,
+      "failure_causes": {
+        "config": 275,
+        "health": 69,
+        "migration": 121,
+        "online-migration": 245,
+        "queues-not-drained": 97,
+        "rollout": 157
+      },
+      "blocked_checks": {}
+    },
+    {
+      "design": "operator",
+      "label": "Operator",
+      "metrics": {
+        "broken": {
+          "mean": 0.17,
+          "ci95": 0.15
+        },
+        "clean_rollbacks": {
+          "mean": 10.27,
+          "ci95": 1.1
+        },
+        "data_loss": {
+          "mean": 0.17,
+          "ci95": 0.15
+        },
+        "downtime": {
+          "mean": 22.62,
+          "ci95": 0.77
+        },
+        "engineer": {
+          "mean": 29.48,
+          "ci95": 1.59
+        },
+        "failed": {
+          "mean": 10.43,
+          "ci95": 1.12
+        },
+        "first_try": {
+          "mean": 75.17,
+          "ci95": 1
+        },
+        "message_loss": {
+          "mean": 0,
+          "ci95": 0
+        },
+        "preflight_blocks": {
+          "mean": 16.63,
+          "ci95": 1.27
+        },
+        "reached": {
+          "mean": 89.57,
+          "ci95": 1.12
+        }
+      },
+      "downtime_p95_minutes": 35,
+      "failure_causes": {
+        "migration": 125,
+        "rollout": 188
+      },
+      "blocked_checks": {
+        "backup-space": 103,
+        "config": 169,
+        "health": 90,
+        "queues-drained": 172
+      }
+    },
+    {
+      "design": "operator_no_preflight",
+      "label": "Operator without preflight",
+      "metrics": {
+        "broken": {
+          "mean": 0.13,
+          "ci95": 0.14
+        },
+        "clean_rollbacks": {
+          "mean": 20.4,
+          "ci95": 1.06
+        },
+        "data_loss": {
+          "mean": 0.13,
+          "ci95": 0.14
+        },
+        "downtime": {
+          "mean": 22.64,
+          "ci95": 0.83
+        },
+        "engineer": {
+          "mean": 27.73,
+          "ci95": 1.26
+        },
+        "failed": {
+          "mean": 20.53,
+          "ci95": 1.13
+        },
+        "first_try": {
+          "mean": 75.17,
+          "ci95": 1
+        },
+        "message_loss": {
+          "mean": 5.3,
+          "ci95": 0.79
+        },
+        "preflight_blocks": {
+          "mean": 0,
+          "ci95": 0
+        },
+        "reached": {
+          "mean": 79.47,
+          "ci95": 1.13
+        }
+      },
+      "downtime_p95_minutes": 62.5,
+      "failure_causes": {
+        "backup-space": 99,
+        "config": 159,
+        "health": 74,
+        "migration": 113,
+        "queues-not-drained": 129,
+        "rollout": 171
+      },
+      "blocked_checks": {}
+    },
+    {
+      "design": "operator_no_backup",
+      "label": "Operator without backup",
+      "metrics": {
+        "broken": {
+          "mean": 4.8,
+          "ci95": 0.61
+        },
+        "clean_rollbacks": {
+          "mean": 5.63,
+          "ci95": 1.01
+        },
+        "data_loss": {
+          "mean": 4.8,
+          "ci95": 0.61
+        },
+        "downtime": {
+          "mean": 37.12,
+          "ci95": 2.51
+        },
+        "engineer": {
+          "mean": 55.56,
+          "ci95": 3.26
+        },
+        "failed": {
+          "mean": 10.43,
+          "ci95": 1.12
+        },
+        "first_try": {
+          "mean": 77.53,
+          "ci95": 1.29
+        },
+        "message_loss": {
+          "mean": 0,
+          "ci95": 0
+        },
+        "preflight_blocks": {
+          "mean": 13.67,
+          "ci95": 1.22
+        },
+        "reached": {
+          "mean": 89.57,
+          "ci95": 1.12
+        }
+      },
+      "downtime_p95_minutes": 53,
+      "failure_causes": {
+        "migration": 125,
+        "rollout": 188
+      },
+      "blocked_checks": {
+        "config": 169,
+        "health": 90,
+        "queues-drained": 172
+      }
+    }
+  ],
+  "example": [
+    {
+      "design": "scripted",
+      "from": "4.3.0",
+      "final": "4.3.0",
+      "cause": "migration",
+      "rollback": [
+        "Quiesce(4.3.0)",
+        "RestoreBackup(4.3.0)",
+        "Core(4.3.0)",
+        "Verify(4.3.0)"
+      ],
+      "downtime_minutes": 130.2
+    },
+    {
+      "design": "helm_atomic",
+      "from": "4.3.0",
+      "final": "",
+      "cause": "migration",
+      "rollback": [
+        "Gateway(4.3.0)",
+        "Core(4.3.0)"
+      ],
+      "downtime_minutes": 360
+    },
+    {
+      "design": "operator",
+      "from": "4.3.0",
+      "final": "4.3.0",
+      "cause": "migration",
+      "rollback": [
+        "Quiesce(4.3.0)",
+        "RestoreBackup(4.3.0)",
+        "Core(4.3.0)",
+        "Verify(4.3.0)"
+      ],
+      "downtime_minutes": 85.2
+    },
+    {
+      "design": "operator_no_preflight",
+      "from": "4.3.0",
+      "final": "4.3.0",
+      "cause": "migration",
+      "rollback": [
+        "Quiesce(4.3.0)",
+        "RestoreBackup(4.3.0)",
+        "Core(4.3.0)",
+        "Verify(4.3.0)"
+      ],
+      "downtime_minutes": 85.2
+    },
+    {
+      "design": "operator_no_backup",
+      "from": "4.3.0",
+      "final": "",
+      "cause": "migration",
+      "rollback": [
+        "Quiesce(4.3.0)",
+        "ManualRestore(4.3.0)"
+      ],
+      "downtime_minutes": 360
+    }
+  ]
+}

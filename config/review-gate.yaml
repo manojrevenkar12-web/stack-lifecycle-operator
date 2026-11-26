@@ -1,0 +1,26 @@
+# Rules for tools/stackctl review-gate. Paths are shell globs relative to the repository root.
+
+# Changes here can weaken security or lose customer data. An AI-assisted change to any of them needs
+# a named human reviewer (Reviewed-by: trailer) and a test change in the same range.
+sensitive:
+  - "config/rbac/*"
+  - "config/manager/*"
+  - "config/crd/*"
+  - "internal/controller/*.go"
+  - "internal/plan/*.go"
+  - "internal/render/*.go"
+  - "api/*/*.go"
+  - "Dockerfile"
+  - ".github/workflows/*"
+  - "config/review-gate.yaml"
+
+tests:
+  - "*_test.go"
+  - "*/*_test.go"
+  - "*/*/*_test.go"
+  - "tools/stackctl/tests/*"
+
+# Written once by `go run ./cmd/lab sim --split heldout`; never edited afterwards.
+locked:
+  - "results/heldout.json"
+  - "results/HELDOUT.lock"

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: site-core-7f9c
+spec:
+  containers:
+    - name: core
+      image: registry.example.com/platform/core:5.0.0
+      env:
+        - name: DATABASE_PASSWORD
+          value: hunter2-hunter2
+        - name: RETENTION_DAYS
+          value: "180"
+        - name: DATABASE_URL
+          value: postgres://platform:s3cr3t-pass@site-postgres:5432/platform

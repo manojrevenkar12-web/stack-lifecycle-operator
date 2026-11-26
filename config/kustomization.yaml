@@ -1,0 +1,6 @@
+# kubectl apply -k config -n <namespace>
+resources:
+  - crd/platform.stacklifecycle.io_platformstacks.yaml
+  - rbac/role.yaml
+  - rbac/role_binding.yaml
+  - manager/manager.yaml

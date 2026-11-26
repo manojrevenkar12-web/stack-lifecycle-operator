@@ -1,0 +1,123 @@
+/* Design tokens. Every colour, size and duration in the dashboard comes from here. */
+:root {
+  color-scheme: light dark;
+
+  /* surfaces and ink (light) */
+  --page: #f6f4ef;
+  --surface-1: #ffffff;
+  --surface-2: #fbfaf7;
+  --ink-1: #191919;
+  --ink-2: #666666;
+  --ink-3: #8a8a8a;
+  --rule: #e4e1d9;
+  --grid: #e7e7e7;
+  --axis: #c2c2c2;
+  --accent: #14315c;          /* navy: headings, focus, selected control */
+  --accent-ink: #ffffff;
+  --good-ink: #006c10;
+  --bad-ink: #b3261e;
+
+  /* categorical series, fixed per design (validated: dataviz validate_palette.js) */
+  --series-operator: #257de0;
+  --series-scripted: #f47230;
+  --series-helm: #00b894;
+  --series-nopreflight: #f2a600;
+  --series-nobackup: #ee7fac;
+
+  /* type */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Inter Display", "Inter", system-ui, sans-serif;
+  --font-mono: "DejaVu Sans Mono", ui-monospace, "SFMono-Regular", monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.75rem;
+  --text-hero: 3rem;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 650;
+
+  /* space (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --page-max: 1180px;
+
+  /* chart marks */
+  --bar-height: 14px;
+  --bar-gap: 2px;
+  --row-height: 26px;
+  --label-col: 196px;
+  --value-col: 92px;
+  --mark-radius: 4px;
+  --whisker: 1.5px;
+  --swatch: 10px;
+  --cap: 7px;
+  --bar-stagger: 12ms;
+  --tile-min: 168px;
+  --panel-min: 210px;
+  --case-min: 72px;
+  --case-accent: 3px;
+  --cases-cols: 5;
+  --tooltip-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+
+  /* motion */
+  --dur-instant: 100ms;
+  --dur-quick: 180ms;
+  --dur-standard: 280ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --stagger: 40ms;
+  --stagger-cap: 400ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0b0b0b;
+    --surface-1: #191919;
+    --surface-2: #141414;
+    --ink-1: #efefef;
+    --ink-2: #9c9c9c;
+    --ink-3: #7a7a7a;
+    --rule: #2a2a2a;
+    --grid: #303030;
+    --axis: #474747;
+    --accent: #9dc8f7;
+    --accent-ink: #0b0b0b;
+    --good-ink: #53c556;
+    --bad-ink: #eb6263;
+    --series-operator: #338ced;
+    --series-scripted: #e76624;
+    --series-helm: #00a888;
+    --series-nopreflight: #d28e05;
+    --series-nobackup: #e24d8b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --page: #0b0b0b;
+  --surface-1: #191919;
+  --surface-2: #141414;
+  --ink-1: #efefef;
+  --ink-2: #9c9c9c;
+  --ink-3: #7a7a7a;
+  --rule: #2a2a2a;
+  --grid: #303030;
+  --axis: #474747;
+  --accent: #9dc8f7;
+  --accent-ink: #0b0b0b;
+  --good-ink: #53c556;
+  --bad-ink: #eb6263;
+  --series-operator: #338ced;
+  --series-scripted: #e76624;
+  --series-helm: #00a888;
+  --series-nopreflight: #d28e05;
+  --series-nobackup: #e24d8b;
+}

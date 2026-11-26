@@ -1,0 +1,7 @@
+2026-11-26T10:01:02Z INFO migration step 17/40 applied
+2026-11-26T10:01:03Z ERROR handover to authority failed target=+49 151 23456789 imsi=262011234567890 contact=ops@customer.example
+2026-11-26T10:01:04Z DEBUG Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ4In0.sig
+2026-11-26T10:01:05Z DEBUG connecting amqp://platform:rabbit-pass@site-rabbitmq:5672/ token=abcd1234efgh
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAexample
+-----END RSA PRIVATE KEY-----

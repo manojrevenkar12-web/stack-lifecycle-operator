@@ -1,0 +1,28 @@
+# Generated from the +kubebuilder:rbac markers in internal/controller; rbac_test.go fails if the two
+# drift apart. A namespaced Role: with WATCH_NAMESPACE set the operator sees one namespace only.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: stack-lifecycle-operator
+rules:
+  - apiGroups: [""]
+    resources: [configmaps, persistentvolumeclaims, services]
+    verbs: [create, get, list, patch, update, watch]
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [create, patch]
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [create, get]
+  - apiGroups: [apps]
+    resources: [deployments, statefulsets]
+    verbs: [create, get, list, patch, update, watch]
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [create, get, list, watch]
+  - apiGroups: [coordination.k8s.io]
+    resources: [leases]
+    verbs: [create, get, update]
+  - apiGroups: [platform.stacklifecycle.io]
+    resources: [platformstacks, platformstacks/status]
+    verbs: [get, list, patch, update, watch]
